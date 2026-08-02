@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEB Aisle Finder</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #cc0000;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #cc0000;
+        }
+        .hint {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:active {
+            background: #990000;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .aisle-group {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .aisle-label {
+            font-weight: bold;
+            color: #cc0000;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .aisle-items {
+            color: #333;
+            font-size: 1rem;
+        }
+        .not-found {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .not-found .aisle-label {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛒 HEB Aisle Finder</h1>
+    <p class="subtitle">Store #623 — San Antonio</p>
+
+    <textarea id="items" placeholder="Enter your grocery list (one item per line):
+
+peanut butter
+coffee
+chips
+bread
+soup"></textarea>
+    <p class="hint">One item per line. Doesn't need to be exact — "chips" will match.</p>
+
+    <button onclick="findAisles()">Sort by Aisle</button>
+
+    <div id="results"></div>
+
+    <script>
+const STORE_GUIDE = {
+    "air conditioner filters": "Left Wall by 51",
+    "air freshener": "51",
+    "aluminum foil": "50",
+    "appliances": "Kitchen",
+    "asian foods": "6",
+    "automotive supplies": "27",
+    "baby accessories": "28-32",
+    "baby food": "28",
+    "baby formula": "28",
+    "baby medication": "30",
+    "baby wipes": "31",
+    "bags/wrap": "50",
+    "bakeware": "Kitchen",
+    "band-aids": "63",
+    "barbecue sauce": "4",
+    "bath soap": "1-2, 59-60",
+    "bath tissue": "49",
+    "batteries": "46",
+    "beans (canned)": "8",
+    "beans (dry)": "5",
+    "beer": "Beer & Wine",
+    "bird seed": "55",
+    "biscuit mix": "10",
+    "bleach": "52",
+    "boxed dinners": "8",
+    "bread": "3",
+    "cake mixes": "10",
+    "candles": "Cards & Party",
+    "candy": "14",
+    "canned chili": "7",
+    "canned fish": "7",
+    "canned fruit": "10",
+    "canned meat": "7",
+    "canned tomatoes": "8",
+    "canned vegetables": "8",
+    "canning supplies": "Kitchen",
+    "cat food": "56",
+    "cat litter": "Left Wall by 56",
+    "cereal": "11",
+    "cereal (hot)": "11",
+    "charcoal": "24-25",
+    "chips": "13",
+    "cleaners/cleansers": "51",
+    "closet items": "Left Wall by 52",
+    "coffee": "15",
+    "coffee creamer": "15",
+    "coffee filters": "15",
+    "condiments": "4",
+    "cookies": "15",
+    "cosmetics": "58",
+    "cotton balls": "58",
+    "cough & cold": "62",
+    "crackers": "15",
+    "dental/oral care": "61",
+    "deodorant": "59-60",
+    "diapers": "32",
+    "diet aids": "64",
+    "dish soap": "51",
+    "dog food": "53-54",
+    "dried fruit": "10",
+    "electrical needs": "27",
+    "eye care": "63",
+    "fabric softener": "52",
+    "facial care": "59",
+    "facial tissue": "49",
+    "feminine hygiene": "Left Wall by 59",
+    "first aid": "63",
+    "floor wax": "51",
+    "flour": "9",
+    "foil bakeware": "10",
+    "foot care": "59",
+    "fruit snacks": "12",
+    "gift cards": "36",
+    "gift wrap": "35",
+    "goya": "5",
+    "glue": "44",
+    "gravy mixes": "7",
+    "greeting cards": "Cards & Party",
+    "hair accessories": "57",
+    "hair care": "57, 60",
+    "hair color": "57",
+    "hardware": "27",
+    "honey": "10",
+    "hosiery": "Apparel",
+    "hot cocoa": "11",
+    "incontinence": "59",
+    "insecticides": "Left Wall by 49",
+    "instant breakfast": "11",
+    "jam/jelly": "10",
+    "jell-o": "10",
+    "juice": "12",
+    "ketchup": "4",
+    "kitchen gadgets": "Kitchen",
+    "kool-aid": "19",
+    "laundry detergent": "52",
+    "laxatives": "62",
+    "light bulbs": "27",
+    "lotion/cream": "1-2, 59-60",
+    "macaroni & cheese": "8",
+    "marshmallows": "10",
+    "matches": "24-25",
+    "mayonnaise": "4",
+    "men's toiletries": "60",
+    "microwaveable food": "7",
+    "milk (canned/powdered)": "10",
+    "mixers": "Beer & Wine",
+    "mops/brooms": "51",
+    "mustard": "4",
+    "napkins": "50",
+    "nutritional aids/bars": "62",
+    "nuts (baking)": "10",
+    "nuts (snacking)": "14",
+    "oil/shortening": "9",
+    "olives": "4",
+    "pancake mix": "12",
+    "paper towels": "49",
+    "party supplies": "Cards & Party",
+    "pasta (canned)": "7",
+    "pasta (dry)": "6",
+    "pastries": "3",
+    "peanut butter": "10",
+    "pet supplies": "53-56",
+    "picante sauce": "4",
+    "pickles": "4",
+    "pimentos": "8",
+    "plates/cups": "50",
+    "pop tarts": "11",
+    "popcorn": "14",
+    "potatoes/stuffing": "8",
+    "pudding/pie filling": "10",
+    "q-tips": "63",
+    "religious candles": "Cards & Party",
+    "rice": "5",
+    "rice cakes": "3",
+    "salad dressing": "4",
+    "salsa": "4",
+    "salt": "10",
+    "school supplies": "44-45",
+    "seasonal items": "46-48",
+    "sewing needs": "52",
+    "shampoo/conditioner": "57",
+    "shaving needs": "59-60",
+    "skin care": "20-21, 59-60",
+    "snacks": "14",
+    "sodas": "17",
+    "soup": "7",
+    "spices": "9",
+    "sports drinks": "16",
+    "starch": "52",
+    "sugar": "9",
+    "syrup": "12",
+    "tea": "16",
+    "toaster pastries": "12",
+    "toothpicks": "50",
+    "tortillas": "3",
+    "toys": "36-40",
+    "trash bags": "50",
+    "vinegar": "4",
+    "vitamins": "2",
+    "water": "17-19",
+    "wine": "Beer & Wine"
+};
+
+function findAisle(item) {
+    const itemLower = item.toLowerCase().trim();
+    if (!itemLower) return null;
+
+    // Exact match
+    if (STORE_GUIDE[itemLower]) return { item, aisle: STORE_GUIDE[itemLower] };
+
+    // Item is substring of a key
+    for (const [key, aisle] of Object.entries(STORE_GUIDE)) {
+        if (key.includes(itemLower)) return { item, aisle };
+    }
+
+    // Key is substring of item
+    for (const [key, aisle] of Object.entries(STORE_GUIDE)) {
+        if (itemLower.includes(key)) return { item, aisle };
+    }
+
+    // Word-level matching
+    const itemWords = itemLower.split(/\s+/);
+    for (const [key, aisle] of Object.entries(STORE_GUIDE)) {
+        const keyWords = key.split(/\s+/);
+        for (const word of itemWords) {
+            if (word.length > 3) {
+                for (const kw of keyWords) {
+                    if (word.includes(kw) || kw.includes(word)) return { item, aisle };
+                }
+            }
+        }
+    }
+
+    return { item, aisle: "NOT FOUND" };
+}
+
+function sortKey(aisle) {
+    const match = aisle.match(/\d+/);
+    if (match) return [0, parseInt(match[0])];
+    return [1, aisle];
+}
+
+function findAisles() {
+    const input = document.getElementById('items').value;
+    const items = input.split('\n').map(i => i.trim()).filter(i => i.length > 0);
+
+    if (items.length === 0) return;
+
+    // Find aisles and group by aisle
+    const aisleGroups = {};
+    const notFound = [];
+
+    for (const item of items) {
+        const result = findAisle(item);
+        if (result.aisle === "NOT FOUND") {
+            notFound.push(result.item);
+        } else {
+            if (!aisleGroups[result.aisle]) aisleGroups[result.aisle] = [];
+            aisleGroups[result.aisle].push(result.item);
+        }
+    }
+
+    // Sort aisles
+    const sortedAisles = Object.keys(aisleGroups).sort((a, b) => {
+        const ka = sortKey(a);
+        const kb = sortKey(b);
+        if (ka[0] !== kb[0]) return ka[0] - kb[0];
+        if (typeof ka[1] === 'number' && typeof kb[1] === 'number') return ka[1] - kb[1];
+        return String(ka[1]).localeCompare(String(kb[1]));
+    });
+
+    // Render results
+    let html = '';
+    for (const aisle of sortedAisles) {
+        const itemsStr = aisleGroups[aisle].join(', ');
+        html += `<div class="aisle-group">
+            <div class="aisle-label">Aisle ${aisle}</div>
+            <div class="aisle-items">${itemsStr}</div>
+        </div>`;
+    }
+
+    if (notFound.length > 0) {
+        html += `<div class="aisle-group not-found">
+            <div class="aisle-label">⚠ Not Found</div>
+            <div class="aisle-items">${notFound.join(', ')}</div>
+        </div>`;
+    }
+
+    document.getElementById('results').innerHTML = html;
+}
+    </script>
+</body>
+</html>
