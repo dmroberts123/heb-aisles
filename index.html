@@ -97,6 +97,15 @@
             color: #333;
             font-size: 1rem;
         }
+        .aisle-item {
+            display: inline;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .aisle-item.crossed {
+            text-decoration: line-through;
+            color: #aaa;
+        }
         .not-found {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -638,10 +647,12 @@ function findAisles() {
     // Render results
     let html = '';
     for (const aisle of sortedAisles) {
-        const itemsStr = aisleGroups[aisle].join(', ');
+        const itemsHtml = aisleGroups[aisle].map(i =>
+            `<span class="aisle-item" onclick="this.classList.toggle('crossed')">${i}</span>`
+        ).join(', ');
         html += `<div class="aisle-group">
             <div class="aisle-label">Aisle ${aisle}</div>
-            <div class="aisle-items">${itemsStr}</div>
+            <div class="aisle-items">${itemsHtml}</div>
         </div>`;
     }
 
