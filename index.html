@@ -109,7 +109,21 @@ soup"></textarea>
 
     <div id="results"></div>
 
+    <div style="margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <h2 style="font-size: 1.1rem; color: #333; margin-bottom: 10px;">📝 Aisle Correction</h2>
+        <textarea id="note" rows="3" placeholder="e.g. Coffee is actually in Aisle 12, not 15" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; resize: vertical;"></textarea>
+        <button onclick="sendNote()" style="margin-top: 10px; background: #333;">Send Note to David</button>
+    </div>
+
     <script>
+function sendNote() {
+    const note = document.getElementById('note').value.trim();
+    if (!note) return;
+    const subject = encodeURIComponent('HEB Aisle Correction');
+    const body = encodeURIComponent(note);
+    window.location.href = `mailto:dmroberts123@gmail.com?subject=${subject}&body=${body}`;
+}
+
 const STORE_GUIDE = {
     "air conditioner filters": "Left Wall by 51",
     "air freshener": "51",
