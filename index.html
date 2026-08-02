@@ -172,6 +172,7 @@ const STORES = {
         "candles": "Cards & Party",
         "candy": "14",
         "carrot": "In Produce, Right Wall, B13",
+        "carrots": "In Produce, Right Wall, B13",
         "cascade": "51",
         "cereal": "11",
         "charcoal": "24-25",
@@ -215,6 +216,7 @@ const STORES = {
         "garlic bread": "22, B13",
         "gift cards": "36",
         "gift wrap": "35",
+        "ginger": "Produce, A13",
         "glue": "44",
         "grated parmesan cheese": "Meat Market, Back Wall, A27",
         "gravy": "7",
@@ -245,6 +247,7 @@ const STORES = {
         "matches": "24-25",
         "mccafe": "16, A15",
         "mayo": "4, B12",
+        "mushroom soup": "7, A7",
         "mustard": "4, B6",
         "napkins": "50",
         "nutella": "3, B3",
@@ -473,6 +476,12 @@ const STORES = {
     }
 };
 
+const RECIPES = {
+    "chicken curry": ["carrots", "green beans", "mushroom soup", "coconut milk", "bell pepper", "ginger"],
+    "huevos rancheros": ["eggs", "bacon", "refried beans", "salsa", "potato"],
+    "breakfast tacos": ["eggs", "bacon", "potato", "cheese", "tortilla"]
+};
+
 // Remember store selection
 function saveStore() {
     localStorage.setItem('selectedStore', document.getElementById('store').value);
@@ -554,9 +563,28 @@ function sortKey(aisle) {
 
 function findAisles() {
     const input = document.getElementById('items').value;
-    const items = input.split('\n').map(i => i.trim()).filter(i => i.length > 0);
+    let items = input.split('\n').map(i => i.trim()).filter(i => i.length > 0);
 
     if (items.length === 0) return;
+
+    // Expand recipes into ingredients
+    let expanded = [];
+    for (const item of items) {
+        const recipe = RECIPES[item.toLowerCase()];
+        if (recipe) {
+            expanded = expanded.concat(recipe);
+        } else {
+            expanded.push(item);
+        }
+    }
+    // Remove duplicates (case-insensitive)
+    const seen = new Set();
+    items = expanded.filter(item => {
+        const lower = item.toLowerCase();
+        if (seen.has(lower)) return false;
+        seen.add(lower);
+        return true;
+    });
 
     // Find aisles and group by aisle
     const aisleGroups = {};
