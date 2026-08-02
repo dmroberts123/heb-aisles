@@ -491,28 +491,51 @@ function findAisle(item) {
     // Exact match
     if (storeGuide[itemLower]) return { item, aisle: storeGuide[itemLower] };
 
-    // Item is substring of a key
+    // Item is substring of a key (e.g., "beans" matches "beans (canned)")
+    // Find the BEST match (shortest key = most specific)
+    let bestMatch = null;
+    let bestLen = Infinity;
     for (const [key, aisle] of Object.entries(storeGuide)) {
-        if (key.includes(itemLower)) return { item, aisle };
-    }
-
-    // Key is substring of item
-    for (const [key, aisle] of Object.entries(storeGuide)) {
-        if (itemLower.includes(key)) return { item, aisle };
-    }
-
-    // Word-level matching
-    const itemWords = itemLower.split(/\s+/);
-    for (const [key, aisle] of Object.entries(storeGuide)) {
-        const keyWords = key.split(/\s+/);
-        for (const word of itemWords) {
-            if (word.length > 3) {
-                for (const kw of keyWords) {
-                    if (word.includes(kw) || kw.includes(word)) return { item, aisle };
-                }
+        if (key.includes(itemLower)) {
+            if (key.length < bestLen) {
+                bestLen = key.length;
+                bestMatch = { item, aisle };
             }
         }
     }
+    if (bestMatch) return bestMatch;
+
+    // Key is substring of item — find longest matching key (most specific)
+    let longestMatch = null;
+    let longestLen = 0;
+    for (const [key, aisle] of Object.entries(storeGuide)) {
+        if (itemLower.includes(key) && key.length > longestLen) {
+            longestLen = key.length;
+            longestMatch = { item, aisle };
+        }
+    }
+    if (longestMatch) return longestMatch;
+
+    // Word-level matching — prefer matches with more words in common
+    let wordBest = null;
+    let wordBestScore = 0;
+    const itemWords = itemLower.split(/\s+/);
+    for (const [key, aisle] of Object.entries(storeGuide)) {
+        const keyWords = key.split(/\s+/);
+        let score = 0;
+        for (const word of itemWords) {
+            if (word.length > 3) {
+                for (const kw of keyWords) {
+                    if (word.includes(kw) || kw.includes(word)) score++;
+                }
+            }
+        }
+        if (score > wordBestScore) {
+            wordBestScore = score;
+            wordBest = { item, aisle };
+        }
+    }
+    if (wordBest) return wordBest;
 
     return { item, aisle: "NOT FOUND" };
 }
