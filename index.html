@@ -124,7 +124,7 @@
         <option value="kanisha">Kanisha</option>
     </select>
 
-    <textarea id="items" placeholder="Enter your grocery list (one item per line):
+    <textarea id="items" oninput="saveList()" placeholder="Enter your grocery list (one item per line):
 
 peanut butter
 coffee
@@ -133,7 +133,10 @@ bread
 soup"></textarea>
     <p class="hint">One item per line. Doesn't need to be exact — "chips" will match.</p>
 
-    <button onclick="findAisles()">Sort by Aisle</button>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="findAisles()" style="flex: 1;">Sort by Aisle</button>
+        <button onclick="clearList()" style="flex: 0 0 auto; width: 120px; background: #666;">Clear List</button>
+    </div>
 
     <div id="results"></div>
 
@@ -487,10 +490,25 @@ function saveStore() {
     localStorage.setItem('selectedStore', document.getElementById('store').value);
 }
 
-// Load saved store on page load
+// Auto-save grocery list as user types
+function saveList() {
+    localStorage.setItem('groceryList', document.getElementById('items').value);
+}
+
+// Clear the saved list
+function clearList() {
+    document.getElementById('items').value = '';
+    localStorage.removeItem('groceryList');
+    document.getElementById('results').innerHTML = '';
+}
+
+// Load saved store and list on page load
 (function() {
-    const saved = localStorage.getItem('selectedStore');
-    if (saved) document.getElementById('store').value = saved;
+    const savedStore = localStorage.getItem('selectedStore');
+    if (savedStore) document.getElementById('store').value = savedStore;
+
+    const savedList = localStorage.getItem('groceryList');
+    if (savedList) document.getElementById('items').value = savedList;
 })();
 
 function getStoreGuide() {
