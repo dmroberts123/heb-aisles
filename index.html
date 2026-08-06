@@ -29,20 +29,7 @@
             margin-bottom: 20px;
             font-size: 0.85rem;
         }
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-            margin-bottom: 15px;
-            background: white;
-        }
-        select:focus {
-            outline: none;
-            border-color: #cc0000;
-        }
+
         textarea {
             width: 100%;
             height: 200px;
@@ -119,11 +106,6 @@
     <h1>🛒 HEB Aisle Finder</h1>
     <p class="subtitle">Select your store, enter your list, get sorted aisles</p>
 
-    <select id="store" onchange="saveStore()">
-        <option value="cheska">Cheska</option>
-        <option value="kanisha">Kanisha</option>
-    </select>
-
     <textarea id="items" oninput="saveList()" placeholder="Enter your grocery list (one item per line):
 
 peanut butter
@@ -147,8 +129,7 @@ soup"></textarea>
     </div>
 
     <script>
-const STORES = {
-    cheska: {
+const STORE_GUIDE = {
         "activia": "Dairy, Back Wall, A20",
         "advil": "64",
         "almonds": "15, B7",
@@ -310,173 +291,6 @@ const STORES = {
         "water": "17-19",
         "wine": "Beer & Wine"
     },
-    kanisha: {
-        "air conditioner filters": "Left Wall",
-        "air freshener": "12",
-        "aluminum foil": "11",
-        "appliances": "6",
-        "asian foods": "3",
-        "aveeno": "57 (Shampoo/Conditioner), 59 (Lotion), 60 (Body Wash)",
-        "automotive supplies": "Left Wall",
-        "baby accessories": "20",
-        "baby food": "20",
-        "baby formula": "20",
-        "baby medication": "20",
-        "baby wipes": "20",
-        "bags/wrap": "11",
-        "bakeware": "6",
-        "band-aids": "25",
-        "barbecue sauce": "2",
-        "bath soap": "22",
-        "bath tissue": "11",
-        "batteries": "Front of Aisle 10",
-        "beans (canned)": "4",
-        "beans (dry)": "3",
-        "beer": "1",
-        "bird seed": "Back of Aisle 13",
-        "biscuit mix": "5",
-        "bleach": "12",
-        "boxed dinners": "3",
-        "bread": "2",
-        "cake mixes": "6",
-        "candles": "12",
-        "candy": "9",
-        "canned chili": "4",
-        "canned fish": "4",
-        "canned fruit": "4",
-        "canned meat": "4",
-        "canned tomatoes": "4",
-        "canned vegetables": "4",
-        "canning supplies": "3",
-        "cat food": "13",
-        "cat litter": "13",
-        "cereal": "6",
-        "cereal (hot)": "6",
-        "charcoal": "10",
-        "chips": "7",
-        "cleaners/cleansers": "12",
-        "closet items": "12",
-        "coffee": "8",
-        "coffee creamer": "8",
-        "coffee filters": "8",
-        "condiments": "2",
-        "cookies": "8",
-        "cosmetics": "21",
-        "cotton balls": "21",
-        "cough & cold": "24",
-        "crackers": "8",
-        "decaf": "8",
-        "dental/oral care": "23",
-        "deodorant": "23",
-        "diapers": "19",
-        "diet aids": "23",
-        "dish soap": "12",
-        "dog food": "13",
-        "dried fruit": "6",
-        "efferdent": "62, A5",
-        "electrical needs": "Left Wall",
-        "eye care": "23",
-        "fabric softener": "12",
-        "facial care": "23",
-        "facial tissue": "11",
-        "feminine hygiene": "Left Wall",
-        "first aid": "25",
-        "floor wax": "12",
-        "flour": "5",
-        "foil bakeware": "6",
-        "foot care": "23",
-        "fruit snacks": "7",
-        "gift cards": "Front of Aisle 9",
-        "gift wrap": "18",
-        "goya": "3",
-        "glue": "Left Wall",
-        "gravy mixes": "3",
-        "greeting cards": "18",
-        "hair accessories": "22",
-        "hair care": "22",
-        "hair color": "22",
-        "hardware": "Left Wall",
-        "honey": "2",
-        "hosiery": "Left Wall",
-        "hot cocoa": "8",
-        "incontinence": "Left Wall",
-        "insecticides": "Left Wall",
-        "instant breakfast": "6",
-        "jam/jelly": "2",
-        "jell-o": "5",
-        "juice": "9",
-        "ketchup": "4, B8",
-        "kitchen gadgets": "6",
-        "kool-aid": "9",
-        "laundry detergent": "52",
-        "laxatives": "24",
-        "light bulbs": "Left Wall",
-        "lotion/cream": "21",
-        "macaroni & cheese": "4",
-        "marshmallows": "5",
-        "matches": "10",
-        "mayonnaise": "2",
-        "men's toiletries": "23",
-        "microwaveable food": "7",
-        "milk (canned/powdered)": "5",
-        "mixers": "1",
-        "mops/brooms": "12",
-        "mustard": "4, B6",
-        "napkins": "11",
-        "nutritional aids/bars": "24",
-        "nuts (baking)": "5",
-        "nuts (snacking)": "7",
-        "oil/shortening": "5",
-        "olives": "3",
-        "oxy clean": "52",
-        "pancake mix": "5",
-        "paper towels": "11",
-        "party supplies": "18",
-        "pasta (canned)": "4",
-        "pasta (dry)": "3",
-        "pastries": "8",
-        "peanut butter": "2",
-        "pet supplies": "13",
-        "picante sauce": "3",
-        "pickles": "3",
-        "pimentos": "3",
-        "plates/cups": "11",
-        "pop tarts": "6",
-        "popcorn": "7",
-        "potatoes/stuffing": "3",
-        "pudding": "6",
-        "q tips": "63",
-        "rice": "3",
-        "rice cakes": "7",
-        "salad dressing": "2",
-        "salsa": "7",
-        "salt": "5",
-        "school supplies": "Left Wall",
-        "seasonal items": "18-19",
-        "sewing needs": "23",
-        "shampoo/conditioner": "22",
-        "shaving needs": "23",
-        "skin care": "21",
-        "snacks": "7",
-        "sodas": "10",
-        "soup": "4",
-        "spices": "5",
-        "sports drinks": "9",
-        "starch": "12",
-        "sugar": "5",
-        "syrup": "5",
-        "tea": "8",
-        "toaster pastries": "6",
-        "toothpaste": "62",
-        "toothpicks": "11",
-        "tortillas": "2",
-        "toys": "20",
-        "trash bags": "11",
-        "vinegar": "3",
-        "vitamins": "25",
-        "water": "14",
-        "wine": "1"
-    }
 };
 
 const RECIPES = {
@@ -484,11 +298,6 @@ const RECIPES = {
     "huevos rancheros": ["eggs", "bacon", "refried beans", "salsa", "potato"],
     "breakfast tacos": ["eggs", "bacon", "potato", "cheese", "tortilla"]
 };
-
-// Remember store selection
-function saveStore() {
-    localStorage.setItem('selectedStore', document.getElementById('store').value);
-}
 
 // Auto-save grocery list as user types
 function saveList() {
@@ -502,18 +311,14 @@ function clearList() {
     document.getElementById('results').innerHTML = '';
 }
 
-// Load saved store and list on page load
+// Load saved list on page load
 (function() {
-    const savedStore = localStorage.getItem('selectedStore');
-    if (savedStore) document.getElementById('store').value = savedStore;
-
     const savedList = localStorage.getItem('groceryList');
     if (savedList) document.getElementById('items').value = savedList;
 })();
 
 function getStoreGuide() {
-    const storeKey = document.getElementById('store').value;
-    return STORES[storeKey];
+    return STORE_GUIDE;
 }
 
 function findAisle(item) {
@@ -652,7 +457,7 @@ function findAisles() {
 function sendNote() {
     const note = document.getElementById('note').value.trim();
     if (!note) return;
-    const store = document.getElementById('store').value;
+    const store = 'cheska';
     const subject = encodeURIComponent(`HEB Aisle Correction (${store})`);
     const body = encodeURIComponent(note);
     window.location.href = `mailto:dmroberts123@gmail.com?subject=${subject}&body=${body}`;
